@@ -46,10 +46,19 @@ module vga_timing #(
 		end
 	end
 
-	assign x = (hc < HZNT_WIDTH)  ? hc : 0;
-	assign y = (vc < VERT_HEIGHT) ? vc : 0;
-	assign in_frame	= (hc < HZNT_WIDTH && vc < VERT_HEIGHT) ? 1 : 0;
-	assign hsync = (hc >= HZNT_WIDTH + HZNT_RRONTP && hc < HZNT_FULL_WIDTH - HZNT_BACKP) ? 1 : 0;
-	assign vsync = (vc >= VERT_HEIGHT + VERT_FRONTP && vc < VERT_FULL_HEIGHT - VERT_BACKP) ? 1 : 0;
+	reg vsync_loc, hsync_loc;
+	always @(posedge clk) begin
+		x <= (hc < HZNT_WIDTH)  ? hc : 0;
+		y <= (vc < VERT_HEIGHT) ? vc : 0;
+		in_frame <= (hc < HZNT_WIDTH && vc < VERT_HEIGHT);
+
+		vsync_loc = (vc >= VERT_HEIGHT + VERT_FRONTP && vc < VERT_FULL_HEIGHT - VERT_BACKP);
+		hsync_loc = (hc >= HZNT_WIDTH + HZNT_RRONTP && hc < HZNT_FULL_WIDTH - HZNT_BACKP);
+
+		vsync <= vsync_loc;
+		hsync <= (hsync_loc && !vsync_loc);
+	end
+
+
 
 endmodule

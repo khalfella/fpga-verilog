@@ -76,16 +76,13 @@ module top (
 	);
 
 
-	wire hsyn;
-	assign hsyn = (vsync) ? 0 : hsync;
-
 	SB_IO #(
 	  .PIN_TYPE(6'b01_0100)  // PIN_OUTPUT_REGISTERED
 	) dvi_data_iob [14:0] (
 	  .PACKAGE_PIN ({P1A1,   P1A2,   P1A3,   P1A4,   P1A7,   P1A8,        P1A9,   P1A10,
 			 P1B1,           P1B3,   P1B4,   P1B7,   P1B8,        P1B9,   P1B10}),
 	  .D_OUT_0     ({x[4],   y[4],   x[3],   y[3],   x[2],   y[2],   x[1],   y[1],
-			 x[1],           y[1],   hsyn,   y[0],   x[0],   in_frame, vsync}),
+			 x[1],           y[1],  hsync,   y[0],   x[0],   in_frame, vsync}),
 
 	  .OUTPUT_CLK  (clk_40mhz)
 	);
