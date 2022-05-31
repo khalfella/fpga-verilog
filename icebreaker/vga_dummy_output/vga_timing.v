@@ -12,8 +12,8 @@ module vga_timing #(
 	parameter	VERT_BACKP	= 23,		// vertical back porch
 
 	// Coordinates bit width
-	parameter	HZNT_COOR_BITS	= 10,
-	parameter	VERT_COOR_BITS	= 10
+	parameter	HZNT_COOR_BITS	= $clog2(HZNT_WIDTH),
+	parameter	VERT_COOR_BITS	= $clog2(VERT_HEIGHT)
 ) (
 	input wire	clk,				// per-pixel clock
 	input wire	reset,				// async reset signal
@@ -58,7 +58,5 @@ module vga_timing #(
 		vsync <= vsync_loc;
 		hsync <= (hsync_loc && !vsync_loc);
 	end
-
-
 
 endmodule
