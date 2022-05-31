@@ -1,5 +1,5 @@
 PROJ = uart_echo
-ADD_SRC = uart_baud_gen.v uart_tx.v uart_rx.v
+ADD_SRC = uart_baud_gen.v uart_tx.v uart_rx.v uart.v
 ADD_DEPS = 
 ADD_CLEAN = 
 
