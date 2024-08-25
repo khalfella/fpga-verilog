@@ -19,18 +19,25 @@ module counter (
 
 	localparam MAXCOUNT = 12000000 - 1;
 
-	// Coun up on clock rising edge or reset on button push
+	// Sets count to be a value between 0 and MAXCOUNT.
 	always @ (posedge clk, posedge rst) begin
 		if (rst == 1'b1) begin
-			led <= 4'b0000;
 			count <= 0;
 		end else begin
 			if (count == MAXCOUNT) begin
-				led <= led + 1;
 				count <= 0;
 			end else begin
 				count <= count + 1;
 			end
+		end
+	end
+
+	// Increment led by one when count == MAXCOUNT.
+	always @(posedge clk, posedge rst) begin
+		if (rst == 1'b1) begin
+			led <= 0;
+		end else if (count == MAXCOUNT) begin
+			led <= led + 1;
 		end
 	end
 
