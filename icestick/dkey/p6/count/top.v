@@ -8,12 +8,12 @@ module top (
 
 	// Outputs
 	output				green,
-	output reg [3:0]		led
+	output [3:0]			led
 );
 
 	wire clk_enable;
-	wire count_1_valid, count_1_last;
-	wire count_2_valid, count_2_last;
+	wire count_1_last;
+	wire count_2_last;
 
 	wire [3:0] count_1_out;
 	wire [3:0] count_2_out;
@@ -33,9 +33,9 @@ module top (
 		.clk(clk),
 		.clk_enable(clk_enable),
 		.rst(~rst_btn),
-		.start(~go_btn || count_2_last),
+		.start(count_2_last),
+		.auto_start(1'b1),
 		.out(count_1_out),
-		.out_valid(count_1_valid),
 		.out_last(count_1_last)
 	);
 
@@ -49,24 +49,12 @@ module top (
 		.clk_enable(clk_enable),
 		.rst(~rst_btn),
 		.start(count_1_last),
+		.auto_start(1'b0),
 		.out(count_2_out),
-		.out_valid(count_2_valid),
 		.out_last(count_2_last)
 	);
 
-
-	always @ ( * ) begin
-		if (count_1_valid) begin
-			led = count_1_out;
-		end else if (count_2_valid) begin
-			led = count_2_out;
-		end else begin
-			led = 0;
-		end
-
-	end
-
-
+	assign led = count_1_out | count_2_out;
 	assign green = count_1_last || count_2_last;
 
 	
