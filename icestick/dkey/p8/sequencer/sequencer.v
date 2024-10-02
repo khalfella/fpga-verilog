@@ -18,7 +18,7 @@ module top(
 
 	// Storage elements
 	reg [1:0]		out1 = 0;
-	reg [2:0]		count = 0;
+	reg [3:0]		count = 0;
 
 	deb	deb_rst_btn (
 		.clk(clk),
