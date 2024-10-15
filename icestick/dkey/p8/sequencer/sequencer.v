@@ -1,6 +1,11 @@
 `default_nettype none
 
-module top(
+module sequencer #(
+	// Parameters
+	parameter			COUNT_WIDTH	= 24,
+	parameter [COUNT_WIDTH-1:0]	MAX_COUNT	= 12000000 - 1,
+	parameter			BNT_DEB_COUNT	= 32'd2000000
+) (
 	// Inputs
 	input			clk,
 	input			rst_nbtn,
@@ -17,49 +22,61 @@ module top(
 	wire			div_clk;
 
 	// Storage elements
-	reg [1:0]		out1 = 0;
-	reg [3:0]		count = 0;
+	reg [1:0]		leds_output = 0;	/* Registered output to LEDs */
+	reg [2:0]		w_addr = 0;		/* Next addr to write seq to */
+	reg [3:0]		num_seqs = 0;		/* Number of stored seqs */
+	reg [2:0]		r_addr = 0;		/* Address to read from */
+	wire [1:0]		r_data;			/* Data read from BRAM */
 
-	deb	deb_rst_btn (
+	deb #(
+		.MAX_BTN_COUNT(BNT_DEB_COUNT)
+	) deb_rst_btn (
 		.clk(clk),
 		.btn(~rst_nbtn),
 		.down(rst_btn)
 	);
 
 
-	deb	deb_set_btn (
+	deb #(
+		.MAX_BTN_COUNT(BNT_DEB_COUNT)
+	) deb_set_btn (
 		.clk(clk),
 		.btn(~set_nbtn),
 		.down(set_btn)
 	);
 
-	deb	p0_set_btn (
+	deb #(
+		.MAX_BTN_COUNT(BNT_DEB_COUNT)
+	) p0_set_btn (
 		.clk(clk),
 		.btn(~p_nbtn[0]),
 		.is_down(p_btn[0])
 	);
 
-	deb	p1_set_btn (
+	deb #(
+		.MAX_BTN_COUNT(BNT_DEB_COUNT)
+	) p1_set_btn (
 		.clk(clk),
 		.btn(~p_nbtn[1]),
 		.is_down(p_btn[1])
 	);
 
 
-	clock_divider clk_div (
+	clock_divider #(
+		.COUNT_WIDTH(COUNT_WIDTH),
+		.MAX_COUNT(MAX_COUNT)
+	) clk_div (
 		.clk(clk),
 		.out(div_clk)
 	);
 
 
 	// Display module
-	reg [2:0]		r_addr = 0;
-	wire [1:0]		r_data;
 
 	memory	bram0 (
 		.clk(clk),
 		.w_en(set_btn),
-		.w_addr(count),
+		.w_addr(w_addr),
 		.w_data(p_btn),
 
 		.r_en(1'b1),
@@ -70,19 +87,22 @@ module top(
 
 
 	always @ (posedge clk) begin
-		if (count != 0 && div_clk) begin
-			out1 <= r_data;
-			r_addr <= (r_addr == (count - 1)) ? 0 : r_addr + 1;
+		if (set_btn == 1'b1) begin
+			w_addr <= w_addr + 1;
+			num_seqs <= (num_seqs == 8) ? 8 : num_seqs + 1;
 		end
 	end
-
 
 	always @ (posedge clk) begin
-		if (set_btn) begin
-			count <= count + 1;
+		if (num_seqs == 0) begin
+			leds_output <= 0;
+			r_addr <= 0;
+		end else if (num_seqs && div_clk) begin
+			leds_output <= r_data;
+			r_addr <= (r_addr == (num_seqs - 1)) ? 0 : r_addr + 1;
 		end
 	end
 
-	assign leds = out1;
+	assign leds = leds_output;
 
 endmodule

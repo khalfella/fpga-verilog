@@ -13,16 +13,19 @@ module memory(
 	output reg [1:0]	r_data
 );
 
-	//
+	/*
+	 * We need 3 bits as the address width and 2 bits for the data width.
+	 * However, if we do so, yosys will not infer BRAM correctly.
+	 */
 	reg [7:0]		bram [0:15];
 
 	always @ (posedge clk) begin
 		if (w_en) begin
-			bram[{2'b00, w_addr}] <= w_data;
+			bram[w_addr] <= w_data;
 		end
 
 		if (r_en) begin
-			r_data <= bram[r_addr][1:0];
+			r_data <= bram[r_addr];
 		end
 	end
 

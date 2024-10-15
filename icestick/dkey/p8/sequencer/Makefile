@@ -1,6 +1,6 @@
 PROJ = sequencer
 ADD_SRC = clock_divider.v  deb.v  memory.v
-ADD_DEPS = 
+ADD_DEPS =
 ADD_CLEAN = abc.history
 
 
@@ -24,11 +24,10 @@ all: $(PROJ).bin
 	--json $(filter-out $<,$^) \
 	--pcf $< \
 	--asc $@ \
-	--placer-heap-cell-placement-timeout 0 \
 	$(if $(PNR_SEED),--seed $(PNR_SEED))
 
 %.json: %.v $(ADD_SRC) $(ADD_DEPS)
-	yosys -ql $*.log -p 'synth_ice40 -top top -json $@' $< $(ADD_SRC)
+	yosys -ql $*.log -p 'synth_ice40 -top sequencer -json $@' $< $(ADD_SRC)
 
 
 
@@ -36,7 +35,7 @@ all: $(PROJ).bin
 ####### Test bench
 ###########################
 
-%_tb: %_tb.v %.v
+%_tb: %_tb.v %.v $(ADD_SRC)
 	iverilog -g2012 -o $@ $^
 
 %_tb.vcd: %_tb
